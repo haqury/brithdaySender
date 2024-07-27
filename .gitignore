@@ -1,0 +1,7 @@
+# PID file generated to support live reload
+.pid
+
+.idea/*
+.vscode
+
+.env

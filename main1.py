@@ -17,7 +17,7 @@ CHAT_ID = os.getenv('CHAT_ID')
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 
 # Чтение файла с днями рождения
-birthdays = pd.read_csv('birthdays.csv')
+birthdays = pd.read_csv('received_file.csv')
 
 # Инициализация бота
 bot = Bot(token=TOKEN)
@@ -41,10 +41,11 @@ def job():
     asyncio.run(main())
 
 # Планирование задачи
-schedule.every().day.at("17:15").do(job)
+schedule.every().day.at("19:50").do(job)
 
 # Основной цикл
 if __name__ == "__main__":
     while True:
         schedule.run_pending()
-        time.sleep(60)  # Подождать 60 секунд перед следующей проверкой
+        print(time.strftime("%H:%M:%S"))  # Вывод текущего времени
+        time.sleep(1)  # Подождать 60 секунд перед следующей проверкой

@@ -18,7 +18,7 @@ chat_id = os.getenv('CHAT_ID')
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 
 # Чтение файла с днями рождения
-birthdays = pd.read_csv('birthdays.csv')
+birthdays = pd.read_csv('received_file.csv')
 
 # Инициализация бота
 bot = Bot(token=token)

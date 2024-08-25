@@ -1,0 +1,2 @@
+﻿default_header_list_for_month,default_line_for_month,default_header_message,default_message,
+ 🎉 Наши именинники в {{month}}: 🎂, 🎈 {{birthday}} – {{position}} {{name}}, 🎉 {{currentDay}} свой день рождения отмечают: 🎂, 🎈{{birthday}} {{position}} - {{name}};

@@ -30,6 +30,50 @@ templates = pd.read_csv('templates.csv')
 # Инициализация бота
 bot = Bot(token=token)
 
+months_ru = {
+    "i": {
+        1: "январь",
+        2: "февраль",
+        3: "март",
+        4: "апрель",
+        5: "май",
+        6: "июнь",
+        7: "июль",
+        8: "август",
+        9: "сентябрь",
+        10: "октябрь",
+        11: "ноябрь",
+        12: "декабрь"
+    },
+    "r": {
+        1: "января",
+        2: "февраля",
+        3: "марта",
+        4: "апреля",
+        5: "мая",
+        6: "июня",
+        7: "июля",
+        8: "августа",
+        9: "сентября",
+        10: "октября",
+        11: "ноября",
+        12: "декабря"
+    },
+    "pr": {
+        1: "январе",
+        2: "феврале",
+        3: "марте",
+        4: "апреле",
+        5: "мае",
+        6: "июне",
+        7: "июле",
+        8: "августе",
+        9: "сентябре",
+        10: "октябре",
+        11: "ноябре",
+        12: "декабре"
+    }
+}
 
 def replace_variables(message, data):
     # Функция, которая будет заменять найденные шаблоны на соответствующие значения
@@ -45,7 +89,7 @@ def replace_variables(message, data):
 
 async def send_for_month(recivers_for_month, date, is_test):
     locale.setlocale(locale.LC_TIME, 'ru_RU')
-    m = date.strftime('%B')
+    m = months_ru['pr'][date.month]
     message = replace_variables(templates['default_header_list_for_month'][0], {'month': m})
     for row in recivers_for_month:
         message = message + '\n\n' + replace_variables(templates['default_line_for_month'][0], row)
@@ -55,18 +99,18 @@ async def send_for_month(recivers_for_month, date, is_test):
 
 
 async def send_birthdays(recivers, date, is_test):
+    message = templates['header_birthday'][0] + '\n\n'
     for idate, rows in recivers.items():
         if idate == date:
             day = 'сегодня'
         else:
-            locale.setlocale(locale.LC_TIME, 'ru_RU')
-            day = datetime.strptime(idate, '%m-%d').strftime('%d %B')
+            day = datetime.strptime(idate, '%m-%d').day.__str__() + ' ' + months_ru['r'][date.month]
 
-        message = replace_variables(templates['default_header_message'][0], {'currentDay': day}) + '\n\n'
+        message = message + '\n' + replace_variables(templates['default_header_message'][0], {'currentDay': day}) + '\n\n'
         for row in rows:
-            message = message + '\n' + replace_variables(templates['default_message'][0], row)
+            message = message + replace_variables(templates['default_message'][0], row) + '\n'
 
-        await send(message, is_test)
+    await send(message, is_test)
 
 
 async def send(message, is_test):

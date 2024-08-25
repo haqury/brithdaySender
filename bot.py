@@ -39,14 +39,14 @@ def save_birthdays():
 # Загрузка дней рождения из CSV файла
 def load_template():
     global template
-    if os.path.exists('template.csv'):
-        template = pd.read_csv('template.csv')
+    if os.path.exists('templates.csv'):
+        template = pd.read_csv('templates.csv')
 
 
 # Сохранение дней рождения в CSV файл
 def save_template():
     global template
-    birthdays.to_csv('template.csv', index=False)
+    birthdays.to_csv('templates.csv', index=False)
 
 # Функция для обработки полученного файла
 async def receive_file(update: Update, context: CallbackContext):

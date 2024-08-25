@@ -1,0 +1,48 @@
+stages:
+  - build
+  - deploy
+
+variables:
+  IMAGE_TAG: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
+  TOKEN: $CI_JOB_TOKEN
+  CHAT_ID: "-123456789"
+  TEST_CHAT_ID: "-987654321"
+
+before_script:
+  - echo "TOKEN=$TOKEN" >> .env
+  - echo "CHAT_ID=$CHAT_ID" >> .env
+  - echo "TEST_CHAT_ID=$TEST_CHAT_ID" >> .env
+
+build:
+  stage: build
+  script:
+    - docker build -t $IMAGE_TAG .
+    - docker push $IMAGE_TAG
+  only:
+    - main  # Укажите ветку, в которой должен происходить процесс
+
+deploy:
+  stage: deploy
+  script:
+    - kubectl set image deployment/your-deployment-name your-container-name=$IMAGE_TAG
+    - kubectl rollout status deployment/your-deployment-name
+  environment:
+    name: production
+  only:
+    - main
+
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: my-cronjob
+spec:
+  schedule: "0 9 * * *"  # Указываем расписание (в данном случае каждый день в 9:00)
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: my-job
+              image: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
+              command: ["python", "main.py"]
+          restartPolicy: OnFailure

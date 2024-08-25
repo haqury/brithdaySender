@@ -1,0 +1,22 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: my-cronjob
+spec:
+  schedule: "0 9 * * *"  # Укажите расписание (например, каждый день в 9:00)
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: my-job
+              image: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
+              command: ["python", "main.py"]
+              volumeMounts:
+                - name: my-volume
+                  mountPath: /app
+          restartPolicy: OnFailure
+          volumes:
+            - name: my-volume
+              persistentVolumeClaim:
+                claimName: my-pvc

@@ -16,6 +16,7 @@ load_dotenv()
 # Вставьте свой токен Telegram-бота
 token = os.getenv('TOKEN')
 chat_id = os.getenv('CHAT_ID')
+test_chat_id = os.getenv('TEST_CHAT_ID')
 
 logger = logging.getLogger(__name__)
 
@@ -42,18 +43,18 @@ def replace_variables(message, data):
     return re.sub(r'{{(\w+)}}', replacer, message)
 
 
-async def send_for_month(recivers_for_month, date):
+async def send_for_month(recivers_for_month, date, is_test):
     locale.setlocale(locale.LC_TIME, 'ru_RU')
     m = date.strftime('%B')
     message = replace_variables(templates['default_header_list_for_month'][0], {'month': m})
     for row in recivers_for_month:
         message = message + '\n\n' + replace_variables(templates['default_line_for_month'][0], row)
 
-    await bot.send_message(chat_id=chat_id, text=message)
+    await send(message, is_test)
     return
 
 
-async def send_birthdays(recivers, date):
+async def send_birthdays(recivers, date, is_test):
     for idate, rows in recivers.items():
         if idate == date:
             day = 'сегодня'
@@ -65,21 +66,28 @@ async def send_birthdays(recivers, date):
         for row in rows:
             message = message + '\n' + replace_variables(templates['default_message'][0], row)
 
+        await send(message, is_test)
+
+
+async def send(message, is_test):
+    if is_test:
+        await bot.send_message(chat_id=test_chat_id, text=message)
+    else:
         await bot.send_message(chat_id=chat_id, text=message)
 
 
 # Асинхронная функция для проверки дней рождения и отправки поздравлений
-async def check_and_send_birthdays(date=datetime.now()):
-    date = datetime.strptime('2024-01-08', '%Y-%m-%d')
+async def check_and_send_birthdays(date=datetime.now(), is_test=False):
+
     days = await product_calendar.get_sand_days(date)
     recivers_for_month = product_calendar.get_recived_for_month(birthdays, date.strftime('%m'))
 
     for day in days:
         if day.strftime('%d') == '01':
-            await send_for_month(recivers_for_month, date)
+            await send_for_month(recivers_for_month, date, is_test)
 
     recivers = product_calendar.get_sends(birthdays, days)
-    await send_birthdays(recivers, date)
+    await send_birthdays(recivers, date, is_test)
 
 
 # Основная функция для выполнения проверки
